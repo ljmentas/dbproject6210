@@ -1,0 +1,44 @@
+
+
+DELIMITER $$
+CREATE PROCEDURE get_report_kind(
+    IN report_kind_id int(100),
+    OUT report_desc varchar(500),
+    OUT result varchar(25)
+)
+BEGIN
+    
+DECLARE description varchar (100);
+    SET description = '';
+
+    select desription into description
+    from report_kind where report_kind.report_id = report_kind_id;
+  
+    IF (description = '') THEN
+       set result =  "ERROR: kind not found";
+    ELSE
+      set report_desc = description;
+      set result = "SUCCESS: kind found";
+    END IF;
+END $$
+
+DELIMITER ;
+
+
+drop procedure get_report_kind;
+
+insert into report_kind values (4,"my test");
+
+CALL get_report_kind(4,@test, @result);
+select @test;
+
+
+select * from report_kind;
+delete from report_kind where report_id = 4;
+
+
+SET SQL_SAFE_UPDATES = 0;
+
+
+
+
