@@ -21,7 +21,7 @@ function getUser(user, callback) {
     console.log(user);
 
 
-    connection.query('select * from reporter where id = ?;', [user.id], function (error, results, fields) {
+    connection.query('select * from reporter where username = ?;', [user.username], function (error, results, fields) {
 
         if (error) callback(null, error);
         callback(results, null);
@@ -29,7 +29,6 @@ function getUser(user, callback) {
     });
 
 };
-
 
 module.exports.createUser = createUser;
 module.exports.getUser = getUser;

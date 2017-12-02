@@ -18,9 +18,7 @@ var fs = require('fs-extra');
 var path = require('path');
 //-------------------
 
-
-
-var api = router.route('/api/v1/user/:id');
+var api = router.route('/api/v1/user/:username');
 
 api.all(function(req,res,next){
     console.log(req.method,req.url);
@@ -31,16 +29,27 @@ api.all(function(req,res,next){
 
 api.get(function(req,res){
     console.log(req.method,req.url);// we should move this to middleware
-    user.getUser({id: req.params.id}, function (result, error) {
+    user.getUser({username: req.params.username}, function (result, error) {
         if (error) {
             console.log(error);
             res.status(500).send({errorMessage: "database error", code: 1000});
         }
-        var response = result[0];
-        res.send(response);
+        if (result == null ||  result.lenght === 0) {
+            //res.send({errorMessage: "user name not found"});
+            console.log(result);
+            res.status(404).send({errorMessage: "user name not found"});
+        } else {
+            var response = result[0];
+            if (response) {
+                res.send(response);
+            }else {
+                res.status(404).send({errorMessage: "user name not found"});
+            };
+            
+        }
+
     });
 });
-
 
 api.get(function(req,res){
     console.log(req.method,req.url);// we should move this to middleware
@@ -54,8 +63,9 @@ api.get(function(req,res){
 });
 
 router.post('/api/recognize/:reportid', upload.single("image"), function (req, res, next) {
-    var bitmap = fs.readFileSync(req.file.path);
-
+    //console.log(JSON.stringify(req.headers)); 
+      var bitmap = fs.readFileSync(req.file.path);
+    console.log("ca toy");
     rekognition.searchFacesByImage({
         "CollectionId": collectionName,
         "FaceMatchThreshold": 70,
@@ -89,6 +99,22 @@ router.post('/api/recognize/:reportid', upload.single("image"), function (req, r
                 res.send({responseMessage: "person not recognized", code: 404});//our own error code
             }
         }
+    });
+});
+
+router.get('/api/v1/reportkind',function(req,res){
+    console.log(req.method,req.url);// we should move this to middleware
+    reportKind.getAll(function (result, error) {
+        if (error) {
+            console.log(error);
+            res.status(500).send({errorMessage: "database error", code: 1000});
+        }
+        if (result) {
+            res.send(result);
+        }else {
+            res.status(404).send({errorMessage: "not found"});
+        }
+
     });
 });
 
