@@ -3,7 +3,7 @@ var router = express.Router();
 var picture = require('./queries/picture');
 var user = require('./queries/user');
 var reportKind = require('./queries/reportKind');
-
+var report = require('./queries/report');
 
 //-------------------
 var collectionName = "ArcherFaces";
@@ -99,6 +99,20 @@ router.post('/api/recognize/:reportid', upload.single("image"), function (req, r
                 res.send({responseMessage: "person not recognized", code: 404});//our own error code
             }
         }
+    });
+});
+
+router.post('/api/v1/report',function (req, res, next) {
+    console.log("-----request called");
+    console.log(req.body);
+    report.createReport(req.body, function(response, error){
+       console.log(response);
+       if(response && response.reportId) {
+           res.send(response);
+       } else {
+           res.status(500).send({errorMessage: "report could not be created"});
+       };
+
     });
 });
 
